@@ -17,4 +17,4 @@ class CustomAdminUser(UserAdmin):
     )
 
 
-# admin.site.unregister(Group)
+admin.site.unregister(Group)

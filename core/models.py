@@ -3,4 +3,4 @@ from django.db import models
 
 
 class User(AbstractUser):
-    avatar = models.ImageField(upload_to='avatars/', default=None, null=True)
+    avatar = models.ImageField(upload_to='avatars/', default=None, null=True, blank=True)

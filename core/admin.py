@@ -1,13 +1,20 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Group
 
 from core.models import User
 
 
 @admin.register(User)
-class CustomAdminUser(admin.ModelAdmin):
+class CustomAdminUser(UserAdmin):
     readonly_fields = ('last_login', 'date_joined')
-    list_display = ('username', 'email', 'first_name', 'last_name')
-    search_fields = ['username', 'email', 'first_name', 'last_name']
-    list_filter = ('is_staff', 'is_active', 'is_superuser')
+    list_display = ('username', 'email', 'first_name', 'last_name',)
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        ('Personal info', {'fields': ('email', 'first_name', 'last_name')})
+    )
 
 
+# admin.site.unregister(Group)

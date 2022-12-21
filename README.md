@@ -6,7 +6,7 @@
 
 ### Стек:
     - Python 3.10
-    - Django
+    - Django 4.1
     - Postgres
 
 ### Запуск:

@@ -19,6 +19,31 @@ services:
       timeout: 3s
       retries: 3
 
+  api:
+    build: .
+    restart: always
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./todolist/:/app/todolist
+      - ./core/:/app/core
+
+  front:
+    image: sermalenk/skypro-front:lesson-36
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - api
 
 
 volumes:

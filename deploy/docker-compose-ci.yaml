@@ -17,7 +17,7 @@ services:
       retries: 3
 
   api:
-    image: ${DOCKERHUB_USERNAME}/todolist:${TAG_NAME}
+    image: ${DOCKER_HUB_USERNAME}/todolist:${TAG_NAME}
     restart: always
     env_file:
       - .env

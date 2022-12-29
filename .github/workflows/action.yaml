@@ -36,6 +36,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Update Docker Compose
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          TAG_NAME: ${{ steps.vars.outputs.tag }}
+        run: |
+          envsubst '$DOCKER_HUB_USERNAME,$TAG_NAME' < deploy/docker-compose-ci.yaml > deploy/docker-compose.yaml
+          rm -f deploy/docker-compose-ci.yaml
       - name: Decrypt secrets
         uses: anthonykgross/ansible-vault-cli-github-action@v1
         with:

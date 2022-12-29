@@ -44,10 +44,9 @@ jobs:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           TAG_NAME: ${{ steps.vars.outputs.tag }}
         run: |
-          mkdir deploy
-          deploy/docker-compose-ci.yaml | envsubst > deploy/docker-compose.yaml
-          deploy/.env | envsubst > deploy/.env
-          rm -f deploy/docker-compose-ci.yaml
+          mkdir todolist
+          deploy/docker-compose-ci.yaml | envsubst > todolist/docker-compose.yaml
+          deploy/.env | envsubst > todolist/.env
       - name: Decrypt secrets
         uses: anthonykgross/ansible-vault-cli-github-action@v1
         with:
@@ -80,4 +79,4 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            sudo docker system prune -a -f
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker system prune -a -f

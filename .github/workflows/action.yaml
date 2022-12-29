@@ -41,8 +41,8 @@ jobs:
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: Update docker-compose
         env:
-          - DOCKERHUB_USERNAME = ${{ secrets.DOCKER_HUB_USERNAME }}
-          - TAG_NAME = ${{ steps.vars.outputs.tag }}
+          DOCKERHUB_USERNAME = ${{ secrets.DOCKER_HUB_USERNAME }}
+          TAG_NAME = ${{ steps.vars.outputs.tag }}
         run: |
           envsubst '$DOCKERHUB_USERNAME, $TAG_NAME' < deploy/docker-compose-ci.yaml > deploy/docker-compose.yaml
           rm -f docker-compose-ci.yaml

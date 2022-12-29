@@ -36,7 +36,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: anthonykgross/ansible-vault-cli-github-action@v1
+      - name: Get tag
+        id: vars
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      - name: Update docker-compose
+        env:
+          - DOCKERHUB_USERNAME = ${{ secrets.DOCKER_HUB_USERNAME }}
+          - TAG_NAME = ${{ steps.vars.outputs.tag }}
+        run: |
+          envsubst '$DOCKERHUB_USERNAME, $TAG_NAME' < deploy/docker-compose-ci.yaml > deploy/docker-compose.yaml
+          rm -f docker-compose-ci.yaml
+      - name: Decrypt envs
+        uses: anthonykgross/ansible-vault-cli-github-action@v1
         with:
           vault_key: ${{ secrets.VAULT_PASSWORD }}
           command: "ansible-vault decrypt deploy/.env"

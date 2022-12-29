@@ -1,15 +1,17 @@
 FROM python:3.10-slim
 
-WORKDIR /app
+WORKDIR /opt/
+
+EXPOSE 8000
 
 COPY poetry.lock pyproject.toml ./
 
 RUN pip install poetry \
     && poetry config virtualenvs.create false\
-    && poetry install --without dev --no-interaction --no-ansi --no-root
+    && poetry install --without dev --no-root
 
 COPY . .
 
 ENTRYPOINT ["bash", "entrypoint.sh"]
 
-CMD python manage.py runserver 0.0.0.0:8000
+CMD ["gunicorn", "todolist.wsgi", "-w", "4", "-b", "0.0.0.0:8000"]

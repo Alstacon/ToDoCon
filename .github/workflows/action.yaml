@@ -32,7 +32,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
   deploy:
     runs-on: ubuntu-22.04
-    needs: build
+    needs: build_and_push
     steps:
       - name: Checkout
         uses: actions/checkout@v3

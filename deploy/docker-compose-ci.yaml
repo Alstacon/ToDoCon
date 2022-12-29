@@ -17,7 +17,7 @@ services:
       retries: 3
 
   api:
-    image: ${DOCKER_HUB_USERNAME}/todolist:${TAG_NAME}
+    image: ${DOCKER_HUB_USERNAME}/todolist:latest
     restart: always
     env_file:
       - .env
@@ -25,8 +25,8 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./todolist/:/app/todolist
-      - ./core/:/app/core
+      - ./todolist/:/opt/todolist
+      - ./core/:/opt/core
 
   collect_static:
     build: .

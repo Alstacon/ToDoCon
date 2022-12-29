@@ -4,6 +4,7 @@
 !todolist/**
 !core/**
 !manage.py
+!deploy/**
 !poetry.lock
 !pyproject.toml
 !.env

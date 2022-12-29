@@ -44,9 +44,8 @@ jobs:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           TAG_NAME: ${{ steps.vars.outputs.tag }}
         run: |
-          mkdir todolist
-          deploy/docker-compose-ci.yaml | envsubst > todolist/docker-compose.yaml
-          deploy/.env | envsubst > todolist/.env
+          envsubst '$DOCKER_HUB_USERNAME,$TAG_NAME' < deploy/docker-compose-ci.yaml > deploy/docker-compose.yaml
+          rm -f deploy/docker-compose-ci.yaml
       - name: Decrypt secrets
         uses: anthonykgross/ansible-vault-cli-github-action@v1
         with:

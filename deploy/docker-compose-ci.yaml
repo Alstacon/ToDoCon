@@ -17,7 +17,7 @@ services:
       retries: 3
 
   api:
-    image: ${DOCKER_HUB_USERNAME}/todolist:latest
+    image: alstacon/todolist:latest
     restart: always
     env_file:
       - .env

@@ -59,7 +59,7 @@ services:
           condition: service_completed_successfully
     volumes:
       - django_static:/usr/share/nginx/html/static/
-      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./todolist/nginx.conf:/etc/nginx/conf.d/default.conf
 
 
 volumes:

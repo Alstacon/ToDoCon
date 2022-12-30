@@ -3,10 +3,7 @@ on:
   push:
     tags:
       - 'v*'
-  pull_request:
-    branches:
-      - 'main'
-      -
+
 jobs:
   build_and_push:
     runs-on: ubuntu-22.04
@@ -68,6 +65,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd todolist
+            docker-compose pull
             docker-compose up -d
       - name: Clear after deploy
         if: always()

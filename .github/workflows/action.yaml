@@ -1,0 +1,78 @@
+name: Build and deploy
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ secrets.DOCKER_HUB_USERNAME }}/todolist
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: build_and_push
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get tag
+        id: vars
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      - name: Update Docker Compose
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          TAG_NAME: ${{ steps.vars.outputs.tag }}
+        run: |
+          envsubst '$DOCKER_HUB_USERNAME,$TAG_NAME' < deploy/docker-compose-ci.yaml > deploy/docker-compose.yaml
+          rm -f deploy/docker-compose-ci.yaml
+      - name: Decrypt envs
+        uses: anthonykgross/ansible-vault-cli-github-action@v1
+        with:
+          vault_key: ${{ secrets.VAULT_PASSWORD }}
+          command: "ansible-vault decrypt deploy/.env"
+      - name: Copy on server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: "deploy/*"
+          target: todolist
+          strip_components: 1
+      - name: Run compose
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd todolist
+            docker-compose pull
+            docker-compose up -d
+      - name: Clear after deploy
+        if: always()
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker system prune -a -f

@@ -9,19 +9,19 @@ from core.models import User
 
 class CreateUserSerializer(serializers.ModelSerializer):
     password = PasswordField(required=True)
-    repeat_password = PasswordField(required=True)
+    password_repeat = PasswordField(required=True)
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'repeat_password', 'first_name', 'last_name', 'email']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'password_repeat']
 
     def validate(self, attrs: dict) -> dict:
-        if attrs['password'] != attrs['repeat_password']:
-            raise ValidationError(detail="Passwords don't match")
+        if attrs['password'] != attrs['password_repeat']:
+            raise ValidationError(detail='Passwords must match')
         return attrs
 
     def create(self, validated_data: dict) -> User:
-        del validated_data['repeat_password']
+        del validated_data['password_repeat']
         validated_data['password'] = make_password(validated_data['password'])
         return super().create(validated_data)
 

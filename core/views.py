@@ -2,13 +2,10 @@ from django.contrib.auth import login
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
-
-from core.models import User
 from core.serializers import CreateUserSerializer, LoginSerializer
 
 
-class UserCreateView(CreateAPIView):
-    queryset = User.objects.all()
+class CreateUserView(CreateAPIView):
     serializer_class = CreateUserSerializer
 
 

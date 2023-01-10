@@ -13,7 +13,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'password_repeat']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password', 'password_repeat']
 
     def validate(self, attrs: dict) -> dict:
         if attrs['password'] != attrs['password_repeat']:
@@ -36,8 +36,29 @@ class LoginSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict) -> User:
         if not (user := authenticate(
-            username=validated_data['username'],
-            password=validated_data['password']
+                username=validated_data['username'],
+                password=validated_data['password']
         )):
             raise AuthenticationFailed
         return user
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'email']
+
+
+class PasswordUpdateSerializer(serializers.Serializer):
+    old_password = PasswordField(required=True)
+    new_password = PasswordField(required=True)
+
+    def validate(self, attrs: dict) -> dict:
+        if not self.instance.check_password(attrs['old_password']):
+            raise ValidationError(detail='Passwords must match')
+        return attrs
+
+    def update(self, instance: User, validated_data: dict) -> User:
+        instance.set_password(validated_data['new_password'])
+        instance.save(update_fields=['password'])
+        return instance

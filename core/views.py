@@ -1,8 +1,11 @@
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from core.serializers import CreateUserSerializer, LoginSerializer
+
+from core.models import User
+from core.serializers import CreateUserSerializer, LoginSerializer, ProfileSerializer, PasswordUpdateSerializer
 
 
 class CreateUserView(CreateAPIView):
@@ -18,3 +21,24 @@ class LoginView(CreateAPIView):
         user = serializer.save()
         login(request, user)
         return Response(data=request.data, status=status.HTTP_200_OK)
+
+
+class ProfileView(RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def get_object(self):
+        return self.request.user
+
+    def delete(self, request, *args, **kwargs):
+        logout(request)
+        return Response(data=request.data, status=status.HTTP_200_OK)
+
+
+class PasswordUpdateView(UpdateAPIView):
+    serializer_class = PasswordUpdateSerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def get_object(self):
+        return self.request.user

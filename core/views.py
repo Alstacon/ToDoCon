@@ -18,9 +18,10 @@ class LoginView(CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        login(request, user)
         return Response(data=request.data, status=status.HTTP_200_OK)
+
+    def perform_create(self, serializer):
+        login(request=self.request, user=serializer.save())
 
 
 class ProfileView(RetrieveUpdateDestroyAPIView):

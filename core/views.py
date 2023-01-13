@@ -27,19 +27,18 @@ class LoginView(CreateAPIView):
 class ProfileView(RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = (IsAuthenticated, )
 
     def get_object(self):
         return self.request.user
 
-    def delete(self, request, *args, **kwargs):
-        logout(request)
-        return Response(data=request.data, status=status.HTTP_200_OK)
+    def perform_destroy(self, instance):
+        logout(self.request)
 
 
 class PasswordUpdateView(UpdateAPIView):
     serializer_class = PasswordUpdateSerializer
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = (IsAuthenticated, )
 
     def get_object(self):
         return self.request.user

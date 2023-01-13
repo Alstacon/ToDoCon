@@ -18,27 +18,27 @@ class LoginView(CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        login(request, user)
         return Response(data=request.data, status=status.HTTP_200_OK)
-
-    def perform_create(self, serializer):
-        login(request=self.request, user=serializer.save())
 
 
 class ProfileView(RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = [IsAuthenticated, ]
 
     def get_object(self):
         return self.request.user
 
-    def perform_destroy(self, instance):
-        logout(self.request)
+    def delete(self, request, *args, **kwargs):
+        logout(request)
+        return Response(data=request.data, status=status.HTTP_200_OK)
 
 
 class PasswordUpdateView(UpdateAPIView):
     serializer_class = PasswordUpdateSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = [IsAuthenticated, ]
 
     def get_object(self):
         return self.request.user

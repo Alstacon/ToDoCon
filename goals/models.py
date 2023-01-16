@@ -17,5 +17,5 @@ class GoalCategory(BaseModel):
         verbose_name_plural = 'Категории'
 
     user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Автор')
-    name = models.CharField(max_length=255, verbose_name='Название')
+    title = models.CharField(max_length=255, verbose_name='Название')
     is_deleted = models.BooleanField(default=False, verbose_name='Удалена')

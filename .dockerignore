@@ -4,6 +4,7 @@
 # except
 !todolist/**
 !core/**
+!goals/**
 !manage.py
 !poetry.lock
 !pyproject.toml

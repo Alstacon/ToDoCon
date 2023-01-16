@@ -19,9 +19,9 @@ class GoalCategoryListView(ListAPIView):
     permission_classes = [IsAuthenticated]
     pagination_class = LimitOffsetPagination
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name']
-    ordering_fields = ['name', 'created']
-    ordering = ['name']
+    search_fields = ['title']
+    ordering_fields = ['title', 'created']
+    ordering = ['title']
 
     def get_queryset(self):
         return GoalCategory.objects.filter(user=self.request.user, is_deleted=False)

@@ -39,10 +39,20 @@ class Goal(BaseModel):
         verbose_name_plural = 'Цели'
 
     user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Автор')
-    category = models.ForeignKey(GoalCategory, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
-    description = models.CharField(max_length=555)
+    category = models.ForeignKey(GoalCategory, on_delete=models.CASCADE, verbose_name='Категория')
+    title = models.CharField(max_length=255, verbose_name='Название')
+    description = models.TextField(verbose_name='Описание')
     status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.to_do, verbose_name='Статус')
     priority = models.PositiveSmallIntegerField(choices=Priority.choices, default=Priority.medium,
                                                 verbose_name='Приоритет')
-    deadline = models.DateTimeField(null=True, blank=True, verbose_name='Дата дедлайна')
+    due_date = models.DateTimeField(null=True, blank=True, verbose_name='Дата дедлайна')
+
+
+class GoalComment(BaseModel):
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
+    goal = models.ForeignKey(Goal, on_delete=models.CASCADE, verbose_name='Цель')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
+    text = models.TextField(verbose_name='Текст комментария')

@@ -146,5 +146,8 @@ SOCIAL_AUTH_VK_EXTRA_DATA = [
     ('email', 'email'),
 ]
 
-
 SOCIAL_AUTH_USER_MODEL = 'core.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination'
+}

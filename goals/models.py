@@ -19,3 +19,30 @@ class GoalCategory(BaseModel):
     user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Автор')
     title = models.CharField(max_length=255, verbose_name='Название')
     is_deleted = models.BooleanField(default=False, verbose_name='Удалена')
+
+
+class Goal(BaseModel):
+    class Status(models.IntegerChoices):
+        to_do = 1, 'К выполнению'
+        in_progress = 2, 'В процессе'
+        done = 3, 'Выполнено'
+        archived = 4, 'Архив'
+
+    class Priority(models.IntegerChoices):
+        low = 1, 'Низкий'
+        medium = 2, 'Средний'
+        high = 3, 'Высокий'
+        critical = 4, 'Критический'
+
+    class Meta:
+        verbose_name = 'Цель'
+        verbose_name_plural = 'Цели'
+
+    user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Автор')
+    category = models.ForeignKey(GoalCategory, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    description = models.CharField(max_length=555)
+    status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.to_do, verbose_name='Статус')
+    priority = models.PositiveSmallIntegerField(choices=Priority.choices, default=Priority.medium,
+                                                verbose_name='Приоритет')
+    deadline = models.DateTimeField(null=True, blank=True, verbose_name='Дата дедлайна')

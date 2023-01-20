@@ -2,7 +2,7 @@ from django.db import transaction
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 
@@ -71,13 +71,19 @@ class GoalListView(ListAPIView):
         )
 
 
-class GoalView(RetrieveUpdateAPIView):
+class GoalView(RetrieveUpdateDestroyAPIView):
     model = Goal
     permission_classes = [IsAuthenticated]
     serializer_class = GoalSerializer
 
     def get_queryset(self):
         return Goal.objects.filter(~Q(status=Goal.Status.archived) & Q(category__is_deleted=False))
+
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            instance.status = Goal.Status.archived
+            instance.save()
+        return instance
 
 
 class GoalCommentCreateView(CreateAPIView):

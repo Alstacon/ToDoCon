@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
@@ -29,7 +30,7 @@ class GoalCategoryListView(ListAPIView):
     ordering = ['title']
 
     def get_queryset(self):
-        return GoalCategory.objects.filter(user_id=self.request.user.id, is_deleted=False)
+        return GoalCategory.objects.select_related('user').filter(user_id=self.request.user.id, is_deleted=False)
 
 
 class GoalCategoryView(RetrieveUpdateDestroyAPIView):
@@ -41,8 +42,10 @@ class GoalCategoryView(RetrieveUpdateDestroyAPIView):
         return GoalCategory.objects.filter(is_deleted=False)
 
     def perform_destroy(self, instance):
-        instance.is_deleted = True
-        instance.save()
+        with transaction.atomic():
+            instance.is_deleted = True
+            instance.save()
+            instance.goals.update(status=Goal.Status.archived)
         return instance
 
 
@@ -89,7 +92,7 @@ class GoalCommentListView(ListAPIView):
     serializer_class = GoalCommentSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['goal']
-    ordering = ['-creatsed']
+    ordering = ['-created']
 
     def get_queryset(self):
         return GoalComment.objects.filter(user_id=self.request.user.id)
@@ -97,8 +100,8 @@ class GoalCommentListView(ListAPIView):
 
 class GoalCommentView(RetrieveUpdateDestroyAPIView):
     model = GoalComment
-    serializer_class = GoalCommentSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    serializer_class = GoalCommentSerializer
 
     def get_queryset(self):
         return GoalComment.objects.filter(user_id=self.request.user.id)

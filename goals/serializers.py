@@ -11,7 +11,7 @@ class GoalCategoryCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = GoalCategory
         fields = '__all__'
-        read_only_fields = ('id', 'user', 'created', 'updated')
+        read_only_fields = ('id', 'user', 'created', 'updated', 'is_deleted')
 
 
 class GoalCategorySerializer(serializers.ModelSerializer):
@@ -69,4 +69,4 @@ class GoalCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = GoalComment
         fields = '__all__'
-        read_only_fields = ('id', 'user', 'created', 'updated', 'goal')
+        read_only_fields = ('id', 'created', 'updated', 'user', 'goal')

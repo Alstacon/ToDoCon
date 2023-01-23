@@ -38,6 +38,7 @@ services:
     volumes:
       - ./todolist/:/opt/todolist
       - ./core/:/opt/core
+      - ./goals/:/opt/goals
   collect_static:
     build: .
     env_file:

@@ -1,7 +1,6 @@
-from django.db.models import Q
 from rest_framework import permissions
 
-from goals.models import BoardParticipant
+from goals.models import BoardParticipant, Board, GoalCategory, Goal
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -11,36 +10,25 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         return request.user.id == obj.user_id
 
 
-class BoardPermissions(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if not request.user.is_authenticated:
-            return False
-        if request.method in permissions.SAFE_METHODS:
-            return BoardParticipant.objects.filter(
-                user=request.user, board=obj
-            ).exists()
-        return BoardParticipant.objects.filter(
-            user=request.user, board=obj, role=BoardParticipant.Role.owner
-        ).exists()
+class BoardPermissions(permissions.IsAuthenticated):
+    def has_object_permission(self, request, view, obj: Board):
+        _filters: dict = {'user': request.user, 'board': obj}
+        if request.method not in permissions.SAFE_METHODS:
+            _filters['role'] = BoardParticipant.Role.owner
+        return BoardParticipant.objects.filter(**_filters).exists()
 
 
-class CategoryPermissions(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if not request.user.is_authenticated:
-            return False
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        return BoardParticipant.objects.filter(
-            Q(user=request.user, board=obj.board) & ~Q(role=BoardParticipant.Role.reader)
-        ).exists()
+class CategoryPermissions(permissions.IsAuthenticated):
+    def has_object_permission(self, request, view, obj: GoalCategory):
+        _filters: dict = {'user': request.user, 'board': obj.board}
+        if request.method not in permissions.SAFE_METHODS:
+            _filters['role__in'] = [BoardParticipant.Role.owner, BoardParticipant.Role.writer]
+        return BoardParticipant.objects.filter(**_filters).exists()
 
 
-class GoalBoardPermissions(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if not request.user.is_authenticated:
-            return False
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        return BoardParticipant.objects.filter(
-            Q(user=request.user, board=obj.category.board) & ~Q(role=BoardParticipant.Role.reader)
-        ).exists()
+class GoalBoardPermissions(permissions.IsAuthenticated):
+    def has_object_permission(self, request, view, obj: Goal):
+        _filters: dict = {'user': request.user, 'board': obj.category.board}
+        if request.method not in permissions.SAFE_METHODS:
+            _filters['role__in'] = [BoardParticipant.Role.owner, BoardParticipant.Role.writer]
+        return BoardParticipant.objects.filter(**_filters).exists()

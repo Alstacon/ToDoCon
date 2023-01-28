@@ -79,7 +79,7 @@ class BoardSerializer(serializers.ModelSerializer):
                     board=instance,
                     role=new_part['role']
                 )
-            if title := validated_data['title']:
+            if title := validated_data.get('title'):
                 instance.title = title
                 instance.save()
 
@@ -115,7 +115,7 @@ class GoalCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = GoalCategory
         fields = '__all__'
-        read_only_fields = ('id', 'user', 'created', 'updated', 'board')
+        read_only_fieflds = ('id', 'user', 'created', 'updated', 'board')
 
 
 class GoalCreateSerializer(serializers.ModelSerializer):

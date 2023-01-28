@@ -10,19 +10,21 @@ def create_objects(apps, schema_editor):
     BoardParticipant = apps.get_model('goals', 'BoardParticipant')
     GoalCategory = apps.get_model('goals', 'GoalCategory')
 
+    now = timezone.now()
+
     with transaction.atomic():
         for user in User.objects.all():
             new_board = Board.objects.create(
                 title='Мои цели',
-                created=timezone.now(),
-                updated=timezone.now()
+                created=now,
+                updated=now
             )
             BoardParticipant.objects.create(
                 user=user,
                 board=new_board,
                 role=1,
-                created=timezone.now(),
-                updated=timezone.now()
+                created=now,
+                updated=now
             )
 
             GoalCategory.objects.filter(user=user).update(board=new_board)

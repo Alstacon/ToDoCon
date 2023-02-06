@@ -32,6 +32,20 @@ services:
       db:
         condition: service_healthy
 
+  bot:
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_started
+    volumes:
+      - ./bot:/opt/bot
+    command: python3 manage.py runbot
+
   collect_static:
     image: alstacon/todolist:${TAG_NAME}
     env_file:
@@ -50,7 +64,7 @@ services:
       - django_static:/opt/static
 
   front:
-    image: sermalenk/skypro-front:lesson-37
+    image: sermalenk/skypro-front:lesson-38
     restart: always
     ports:
       - "80:80"

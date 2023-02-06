@@ -33,6 +33,7 @@ services:
         condition: service_healthy
 
   bot:
+    image: alstacon/todolist:${TAG_NAME}
     env_file:
       - .env
     environment:

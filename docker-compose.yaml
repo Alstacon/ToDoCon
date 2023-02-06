@@ -82,7 +82,7 @@ services:
       api:
         condition: service_started
     volumes:
-      - ./bot:/opt/bot
+      - ./bot/:/opt/bot
     command: python3 manage.py runbot
 
 

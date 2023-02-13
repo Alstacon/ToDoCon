@@ -17,7 +17,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs: dict) -> dict:
         if attrs['password'] != attrs['password_repeat']:
-            raise ValidationError(detail='Passwords must match')
+            raise ValidationError({'password_repeat': 'Passwords must match'})
         return attrs
 
     def create(self, validated_data: dict) -> User:
@@ -32,7 +32,8 @@ class LoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'email')
+        read_only_fields = ('id', 'first_name', 'last_name', 'email')
 
     def create(self, validated_data: dict) -> User:
         if not (user := authenticate(

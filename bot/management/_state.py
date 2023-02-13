@@ -1,3 +1,5 @@
+from typing import Optional
+
 from bot.models import TgUser
 from bot.tg.client import TgClient
 from bot.tg.dc import Message
@@ -15,7 +17,7 @@ class BaseTgUserState:
     def get_verification_code(self) -> str:
         return self.tg_user.set_verification_code()
 
-    def send_message(self, text: str) -> None:
+    def send_message(self, text: Optional[str]) -> None:
         self.tg_client.send_message(
             chat_id=int(self.tg_user.telegram_chat_id),
             text=text

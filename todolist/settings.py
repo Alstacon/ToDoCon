@@ -1,5 +1,5 @@
-import environ
 import os
+import environ
 
 env = environ.Env(
     DEBUG=(bool, False)
@@ -140,7 +140,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/categories'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/category'
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
 
 SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email']

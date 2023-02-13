@@ -56,6 +56,7 @@ jobs:
 
   build_and_push:
     runs-on: ubuntu-22.04
+    needs: tests
     steps:
       - name: Checkout
         uses: actions/checkout@v3

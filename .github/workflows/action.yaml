@@ -12,6 +12,11 @@ jobs:
         image: postgres:14.6-alpine
         env:
           POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 5
         ports:
           - 5432:5432
     steps:
@@ -27,6 +32,7 @@ jobs:
         env:
           SECRET_KEY: 'super-secret'
           POSTGRES_HOST: '127.0.0.1'
+          DB_ENGINE: 'django.db.backends.postgresql'
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres

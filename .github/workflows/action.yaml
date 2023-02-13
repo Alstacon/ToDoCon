@@ -11,7 +11,7 @@ jobs:
       postgres:
         image: postgres:14.6-alpine
         env:
-          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+          POSTGRES_PASSWORD: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 3s

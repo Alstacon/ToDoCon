@@ -15,10 +15,10 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Install dependencies
         run: |
           pip install poetry

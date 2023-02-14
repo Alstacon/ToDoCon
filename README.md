@@ -11,7 +11,7 @@ ___
 - Создание/просмотр/редактирование/удаление досок, категорий, целей и комментариев к ним.
 - Три уровня доступа к доске, включающие возможность чтения и редактирования:
 
-![table](./readme_assets/permission_table.svg)
+&nbsp;&nbsp;&nbsp;&nbsp;![table](./readme_assets/permission_table.svg)
 
 - Авторизация по логину и паролю или через социальную сеть vk.com.
 - Личный кабинет с возможностью смены логина, пароля, имени, фамилии и email-адреса.
@@ -28,18 +28,7 @@ ___
 
 
 ## Запуск:
-1) Установить зависимости.
-2) Заполнить .env следующими значениями:
-   * SECRET_KEY
-   * DEBUG
-   * DB_ENGINE
-   * DB_NAME
-   * DB_USER
-   * DB_PASSWORD
-   * DB_HOST
-   * DB_PORT
-   * DATABASE_URL
-   * SOCIAL_AUTH_VK_OAUTH2_SECRET
-   * SOCIAL_AUTH_VK_OAUTH2_KEY
-   * BOT_TOKEN
-3) docker-compose up --build
+1) Клонируйте репозиторий
+`git clone https://github.com/Alstacon/ToDoCon.git`.
+2) Переименуйте файл `.env.example` в `.env` и заполните его валидными значениями.
+3) Запустите докер `docker-compose up --build -d`.

@@ -28,11 +28,11 @@ class GoalCategory(BaseModel):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
-    user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Автор', related_name='categories')
+    user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Автор', related_name='category')
     title = models.CharField(max_length=255, verbose_name='Название')
     is_deleted = models.BooleanField(default=False, verbose_name='Удалена')
     board = models.ForeignKey(
-        Board, on_delete=models.PROTECT, related_name='categories', verbose_name='Доска'
+        Board, on_delete=models.PROTECT, related_name='category', verbose_name='Доска'
     )
 
     def __str__(self):

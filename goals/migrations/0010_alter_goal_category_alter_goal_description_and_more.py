@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='goalcategory',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='categories', to=settings.AUTH_USER_MODEL, verbose_name='Автор'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='category', to=settings.AUTH_USER_MODEL, verbose_name='Автор'),
         ),
         migrations.AlterField(
             model_name='goalcomment',

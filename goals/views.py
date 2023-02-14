@@ -33,8 +33,8 @@ class GoalCategoryListView(ListAPIView):
 
     def get_queryset(self):
         return GoalCategory.objects.prefetch_related('board__participants').filter(
-            is_deleted=False, board__participants__user_id=self.request.user.id,
-
+            board__participants__user_id=self.request.user.id,
+            is_deleted=False
         )
 
 
@@ -45,13 +45,13 @@ class GoalCategoryView(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return GoalCategory.objects.select_related('user').filter(
-            is_deleted=False, board__participants__user_id=self.request.user.id,
+            is_deleted=False,
         )
 
     def perform_destroy(self, instance):
         with transaction.atomic():
             instance.is_deleted = True
-            instance.save()
+            instance.save(update_fields=('is_deleted',))
             instance.goals.update(status=Goal.Status.archived)
         return instance
 
@@ -95,7 +95,7 @@ class GoalView(RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance):
         with transaction.atomic():
             instance.status = Goal.Status.archived
-            instance.save()
+            instance.save(update_fields=('status',))
         return instance
 
 
@@ -109,6 +109,7 @@ class GoalCommentListView(ListAPIView):
     model = GoalComment
     permission_classes = [IsAuthenticated]
     serializer_class = GoalCommentSerializer
+    pagination_class = LimitOffsetPagination
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['goal']
     ordering = ['-created']
@@ -154,14 +155,12 @@ class BoardView(RetrieveUpdateDestroyAPIView):
     permission_classes = [BoardPermissions, ]
 
     def get_queryset(self):
-        return Board.objects.prefetch_related('participants').filter(
-            participants__user_id=self.request.user.id,
-            is_deleted=False
-        )
+        return Board.objects.filter(is_deleted=False)
 
     def perform_destroy(self, instance):
         with transaction.atomic():
             instance.is_deleted = True
             instance.save(update_fields=('is_deleted',))
+            instance.category.update(is_deleted=True)
             Goal.objects.filter(category__board=instance).update(status=Goal.Status.archived)
         return instance

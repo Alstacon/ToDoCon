@@ -1,4 +1,4 @@
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from rest_framework import serializers
 
@@ -21,22 +21,22 @@ class BoardCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id', 'created', 'updated', 'is_deleted')
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict) -> Board:
         user = validated_data.pop('user')
-        board = Board.objects.create(**validated_data)
+        board: Board = Board.objects.create(**validated_data)
         BoardParticipant.objects.create(user=user, board=board, role=BoardParticipant.Role.owner)
 
         return board
 
 
 class BoardParticipantSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(
-        slug_field='username', queryset=User.objects.all()
-    )
+    role = serializers.ChoiceField(required=True, choices=BoardParticipant.Role.choices[1:])
+    user = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
 
-    role = serializers.ChoiceField(
-        required=True, choices=BoardParticipant.Role.choices[1:]
-    )
+    def validate(self, attrs: dict) -> dict:
+        if attrs['user'] == self.context['request'].user and attrs['role'] != BoardParticipant.Role.owner:
+            raise ValidationError({'role': 'Failed to update owner role'})
+        return attrs
 
     class Meta:
         model = BoardParticipant
@@ -46,60 +46,43 @@ class BoardParticipantSerializer(serializers.ModelSerializer):
 
 class BoardSerializer(serializers.ModelSerializer):
     participants = BoardParticipantSerializer(many=True)
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Board
         fields = '__all__'
-        read_only_fields = ('id', 'created', 'updated')
+        read_only_fields = ('id', 'created', 'updated', 'is_deleted')
 
-    def update(self, instance, validated_data) -> Board:
-        owner: User = validated_data.pop('user')
-        new_participants: dict = validated_data.pop('participants')
-        old_participants: dict = instance.participants.exclude(user=owner)
-        new_by_id = {part['user'].id: part for part in new_participants}
-
+    def update(self, instance: Board, validated_data: dict) -> Board:
+        """Удаляет из списка всех участников, кроме владельца и записывает заново."""
         with transaction.atomic():
-            # определить и выкинуть тех, кого не будет в новом списке участников
-            for old_part in old_participants:
-                if old_part.user_id not in new_by_id.keys():
-                    old_part.delete()
-                # для всех, кто остался
-                else:
-                    # проверяем, изменилась ли роль -> изменяем
-                    if old_part.role != new_by_id[old_part.user_id]['role']:
-                        old_part.role = new_by_id[old_part.user_id]['role']
-                        old_part.save()
-                    # получаем обработанного старого участника и удаляем из словаря новых
-                    new_by_id.pop(old_part.user_id)
-            # для всех, кто остался в новых
-            for new_part in new_by_id.values():
-                BoardParticipant.objects.create(
-                    user=new_part['user'],
+            BoardParticipant.objects.filter(board=instance).exclude(user=self.context['request'].user).delete()
+            BoardParticipant.objects.bulk_create([
+                BoardParticipant(
+                    user=participant['user'],
+                    role=participant['role'],
                     board=instance,
-                    role=new_part['role']
                 )
+                for participant in validated_data.pop('participants', [])
+            ])
+
             if title := validated_data.get('title'):
                 instance.title = title
-                instance.save()
+                instance.save(update_fields=('title',))
 
         return instance
 
 
 class GoalCategoryCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    board = serializers.PrimaryKeyRelatedField(
-        queryset=Board.objects.filter(is_deleted=False)
-    )
 
     class Meta:
         model = GoalCategory
         fields = '__all__'
         read_only_fields = ('id', 'user', 'created', 'updated', 'is_deleted')
 
-    def validate_board(self, value: Board):
+    def validate_board(self, value: Board) -> Board:
         if value.is_deleted:
-            raise serializers.ValidationError('Board is deleted')
+            raise ValidationError(message='Нельзя создать категорию в удаленной доске.')
         if not BoardParticipant.objects.filter(
                 board=value,
                 role__in=[BoardParticipant.Role.owner, BoardParticipant.Role.writer],
@@ -115,23 +98,20 @@ class GoalCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = GoalCategory
         fields = '__all__'
-        read_only_fieflds = ('id', 'user', 'created', 'updated', 'board')
+        read_only_fields = ['id', 'user', 'created', 'updated', 'board']
 
 
 class GoalCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=GoalCategory.objects.filter(is_deleted=False)
-    )
 
     class Meta:
         model = Goal
         fields = '__all__'
         read_only_fields = ('id', 'user', 'created', 'updated')
 
-    def validate_category(self, value: GoalCategory):
+    def validate_category(self, value: GoalCategory) -> GoalCategory:
         if value.is_deleted:
-            raise serializers.ValidationError('Category is deleted')
+            raise ValidationError(message='Нельзя создать цель в удаленной категории')
 
         if not BoardParticipant.objects.filter(
                 board=value.board.id,
@@ -159,7 +139,11 @@ class GoalCommentCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id', 'user', 'created', 'updated')
 
-    def validate_goal(self, value: Goal):
+    def validate_goal(self, value: Goal) -> Goal:
+        if value.status == Goal.Status.archived:
+            raise ValidationError(message='Нельзя оставить комментарий к удаленной цели.')
+        if value.category.board.is_deleted:
+            raise ValidationError(message='Нельзя оставить комментарий к цели в удаленной доске.')
         if not BoardParticipant.objects.filter(
                 board=value.category.board.id,
                 user_id=self.context['request'].user.id,

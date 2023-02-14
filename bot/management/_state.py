@@ -141,6 +141,7 @@ class VerifiedUserState(BaseTgUserState):
     def _handle_cancel_create(self):
         """Сброс флага создания категории."""
         VerifiedUserState.is_create_command = False
+        VerifiedUserState.category_for_create = None
         self.send_message(
             text='''Создание цели отменено.'''
         )

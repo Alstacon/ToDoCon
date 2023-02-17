@@ -22,7 +22,7 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://todocon.ga',]
+CSRF_TRUSTED_ORIGINS = ['https://todocon.ga', ]
 CSRF_COOKIE_SECURE = True
 
 # Application definition

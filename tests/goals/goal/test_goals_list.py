@@ -69,11 +69,12 @@ class TestGoalList(BaseTestCase):
         assert offset_response.json()['count'] == 12
         assert len(offset_response.json()['results']) == 7
 
-    def test_ordering_by_title(self, auth_client, goal_factory, board):
+    def test_ordering_by_due_date(self, auth_client, goal_factory, board):
         _, category = board
-        for title in ['Test title', 'Title', 'New title']:
-            goal_factory.create(title=title, category=category)
+        for date in ['2024-01-01', '2023-02-24', '2023-06-01']:
+            goal_factory.create(category=category, due_date=date)
 
         response = auth_client.get(self.url)
         assert response.status_code == status.HTTP_200_OK
-        assert [goal['title'] for goal in response.json()] == ['New title', 'Test title', 'Title']
+        assert '2023-02-24' in self.date_time_str(response.json()[0]['due_date'])
+        assert '2024-01-01' in self.date_time_str(response.json()[-1]['due_date'])

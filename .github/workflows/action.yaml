@@ -22,8 +22,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
       - name: Install dependencies
         run: |
           pip install poetry
@@ -41,15 +39,7 @@ jobs:
           BOT_TOKEN: "tg_bot:token"
         run: |
           python -m poetry run pytest \
-            --junitxml=pytest.xml \
-            --cov-report=term-missing:skip-covered \
-            --cov=todolist \
-          tests/ | tee pytest-coverage.txt
-      - name: Pytest coverage comment
-        uses: MishaKav/pytest-coverage-comment@main
-        with:
-          pytest-coverage-path: ./pytest-coverage.txt
-          junitxml-path: ./pytest.xml
+            --pytest --cov=./ --cov-report=xml
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
 

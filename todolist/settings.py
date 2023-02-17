@@ -156,7 +156,6 @@ REST_FRAMEWORK = {
 }
 
 BOT_TOKEN = env('BOT_TOKEN')
-TEST_BOT_TOKEN = env('TEST_BOT_TOKEN')
 
 
 # logging

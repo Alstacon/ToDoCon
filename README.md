@@ -1,4 +1,6 @@
 ![logo](./readme_assets/logo2.svg)
+<a href="https://codecov.io/gh/Alstacon/ToDoCon" > <img src="https://img.shields.io/codecov/c/github/Alstacon/ToDoCon?color=EB66A5&style=plastic"  </a>
+
 ### 📋 ToDoCon —
 Это веб-приложение для планирования по категориям, с авторизацией через VK, Telegram-ботом и возможностью шеринга целей.
 

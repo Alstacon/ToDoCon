@@ -13,6 +13,7 @@ ___
 - Create/view/edit/delete boards, categories, goals and comments on them
 - Setting the priority and deadline for each goal.
 - Three levels of access to the board, including the ability to read and edit:
+
 &nbsp;&nbsp;&nbsp;&nbsp;![table](./readme_assets/permission_table.svg)
 
 - Login and password authorization or via a social network vk.com.

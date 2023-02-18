@@ -69,8 +69,8 @@ class GoalListView(ListAPIView):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     filterset_class = GoalDateFilter
     search_fields = ['title', 'description']
-    ordering_fields = ['title', 'created']
-    ordering = ['title']
+    ordering_fields = ['due_date']
+    ordering = ['due_date', '-priority']
 
     def get_queryset(self):
         return Goal.objects.select_related('category').filter(

@@ -22,6 +22,9 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = ['https://todocon.ga', ]
+CSRF_COOKIE_SECURE = True
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -151,7 +154,7 @@ SOCIAL_AUTH_VK_EXTRA_DATA = [
 SOCIAL_AUTH_USER_MODEL = 'core.User'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination'
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
 }
 
 BOT_TOKEN = env('BOT_TOKEN')

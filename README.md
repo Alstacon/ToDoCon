@@ -1,7 +1,7 @@
 ![logo](./readme_assets/logo2.svg)
 
 <a href="https://codecov.io/gh/Alstacon/ToDoCon" > <img src="https://img.shields.io/codecov/c/github/Alstacon/ToDoCon?color=EB66A5&style=plastic"></a>
-
+<a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/pre--commit-passed-EB66A5?style=plastic" alt="pre-commit" style="max-width:100%;"></a>
 ### 📋 ToDoCon —
 This is a web application for planning by category, with authorization via VK, Telegram bot and the ability to share goals.
 ___

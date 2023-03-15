@@ -35,7 +35,7 @@ class BoardParticipantSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs: dict) -> dict:
         if attrs['user'] == self.context['request'].user and attrs['role'] != BoardParticipant.Role.owner:
-            raise ValidationError({'role': 'Failed to update owner role'})
+            raise ValidationError({'Failed to update owner role'})
         return attrs
 
     class Meta:
@@ -82,7 +82,7 @@ class GoalCategoryCreateSerializer(serializers.ModelSerializer):
 
     def validate_board(self, value: Board) -> Board:
         if value.is_deleted:
-            raise ValidationError(message='Нельзя создать категорию в удаленной доске.')
+            raise ValidationError('Нельзя создать категорию в удаленной доске.')
         if not BoardParticipant.objects.filter(
                 board=value,
                 role__in=[BoardParticipant.Role.owner, BoardParticipant.Role.writer],
@@ -141,9 +141,9 @@ class GoalCommentCreateSerializer(serializers.ModelSerializer):
 
     def validate_goal(self, value: Goal) -> Goal:
         if value.status == Goal.Status.archived:
-            raise ValidationError(message='Нельзя оставить комментарий к удаленной цели.')
+            raise ValidationError('Нельзя оставить комментарий к удаленной цели.')
         if value.category.board.is_deleted:
-            raise ValidationError(message='Нельзя оставить комментарий к цели в удаленной доске.')
+            raise ValidationError('Нельзя оставить комментарий к цели в удаленной доске.')
         if not BoardParticipant.objects.filter(
                 board=value.category.board.id,
                 user_id=self.context['request'].user.id,

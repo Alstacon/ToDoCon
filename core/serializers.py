@@ -56,7 +56,7 @@ class PasswordUpdateSerializer(serializers.Serializer):
 
     def validate(self, attrs: dict) -> dict:
         if not self.instance.check_password(attrs['old_password']):
-            raise ValidationError(detail='Passwords must match')
+            raise ValidationError({'invalid': 'Passwords must match'})
         return attrs
 
     def update(self, instance: User, validated_data: dict) -> User:

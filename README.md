@@ -16,7 +16,7 @@ ___
 
 &nbsp;&nbsp;&nbsp;&nbsp;![table](./readme_assets/permission_table.svg)
 
-- Login and password authorization or via a social network vk.com.
+- Login and password authorization via a social network vk.com.
 - Personal account with the ability to change login, password, first name, last name and email address.
 - Telegram bot for viewing created categories and goals, with the function of creating new goals in existing categories.
 
